@@ -49,6 +49,30 @@ int pseudohash(int a, int b)
 	return ret;
 }
 
+int get_index(int a, int b, int c, int mode)
+{
+	int res;
+	switch (mode)
+	{
+		case 1: res = n*k;
+		case 2: res = n*k + k*(k-1)*n;
+		case 3: res = n*k + k*(k-1)*n + m*k;
+		default : res = 0;
+	}
+	if (mode == 0)
+		res += (a-1)*k + b;
+	if (mode == 1)
+	{
+		res += (a-1)*k*(k-1) + (b-1)*(k)+c;
+		res -= b < c ? b : b-1;
+	}
+	if (mode == 2)
+		res += (edges_prefix[a][b]-1)*k + c;
+	if (mode == 3)
+		res += (a-1)*a/2 + b;
+	return res;
+}
+
 int main(int argv, char* args[])
 {
 	cin >> n >> m >> K;
@@ -156,7 +180,7 @@ int main(int argv, char* args[])
 			}
 			constraints.push_back(local_constraint);
 		}
-	}	
+	}
 
 	// Edge constraint
 	for (int i = 1; i <= n; ++i)
@@ -188,7 +212,7 @@ int main(int argv, char* args[])
 				a = get_index(i,k1,k2,1);
 				b = get_index(i,k1,0,0);
 				c = get_index(i,k2,0,0);
-				
+
 
 				vector<int> local_constraint;
 				local_constraint.push_back(-1*a);
@@ -222,7 +246,7 @@ int main(int argv, char* args[])
 				a = get_index(i,j,k,2);
 				b = get_index(i,k,0,0);
 				c = get_index(j,k,0,0);
-				
+
 
 				vector<int> local_constraint;
 				local_constraint.push_back(-1*a);
@@ -239,7 +263,7 @@ int main(int argv, char* args[])
 				local_constraint.push_back(-1*b);
 				local_constraint.push_back(-1*c);
 				constraints.push_back(local_constraint);
-				
+
 			}
 		}
 	}
