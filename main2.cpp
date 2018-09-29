@@ -1,8 +1,9 @@
 #include <iostream>
 #include <string.h>
 #include <math.h>
-#include <bits/stdc++.h>
+#include <vector>
 #include <unordered_map>
+#include <fstream>
 
 #define vit vector<int>::iterator
 #define vec vector<int>
@@ -33,14 +34,14 @@ sort(start itr, end itr)
 */
 using namespace std;
 
-int n, m, k;
+int n, m, K;
 
 int main(int argv, char* args[])
 {
 	cin >> n >> m >> K;
-	
-	ofstream myfile;
-	myfile.open ("test.satoutput", ios::in); 
+
+	ifstream myfile;
+	myfile.open ("test.satoutput", ios::in);
 
 	string sat;
 	myfile >> sat;
@@ -55,7 +56,7 @@ int main(int argv, char* args[])
 			int a;
 			for (int i = 1; i <= n; ++i)
 			{
-				cin >> a;
+				myfile >> a;
 				if(a > 0)
 				{
 					subgraph.push_back(i);
@@ -63,14 +64,14 @@ int main(int argv, char* args[])
 				}
 			}
 
-			cout << "#" << i << " " << counter << endl;
+			cout << "#" << k << " " << counter << endl;
 			if(counter > 0)
 			{
 				for (int j = 0; j < subgraph.size() - 1; ++j)
 				{
-					cout << subgraph[i] << " ";
+					cout << subgraph[j] << " ";
 				}
-				cout << subgraph[0] << endl;
+				cout << subgraph[subgraph.size()-1] << endl;
 			}
 		}
 	}

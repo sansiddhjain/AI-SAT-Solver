@@ -1,8 +1,9 @@
 #include <iostream>
+#include <vector>
 #include <fstream>
 #include <string.h>
 #include <math.h>
-#include <bits/stdc++.h>
+// #include <bits/stdc++.h>
 #include <unordered_map>
 
 #define vit vector<int>::iterator
@@ -35,6 +36,7 @@ sort(start itr, end itr)
 using namespace std;
 
 int n, m, K, nVar, nClause;
+vector< vector<int> > edges_prefix;
 
 int pseudohash(int a, int b)
 {
@@ -55,10 +57,10 @@ int get_index(int a, int b, int c, int mode)
 	int res;
 	switch (mode)
 	{
-		case 1: res = n*K;
-		case 2: res = n*K + K*(K-1)*n;
-		case 3: res = n*K + K*(K-1)*n + m*K;
-		default : res = 0;
+		case 1: res = n*K; break;
+		case 2: res = n*K + K*(K-1)*n; break;
+		case 3: res = n*K + K*(K-1)*n + m*K; break;
+		default : res = 0; break;
 	}
 	if (mode == 0)
 		res += (b-1)*n + a;
@@ -70,33 +72,38 @@ int get_index(int a, int b, int c, int mode)
 	if (mode == 2)
 		res += (edges_prefix[a][b]-1)*K + c;
 	if (mode == 3)
-		res += (a-1)*n - (a-1)*a/2 + b;
+	{
+		// std:://cerr << "a, b - " << a << " " << b << '\n';
+		// std:://cerr << "res before - " << res << '\n';
+		res += (a-1)*n - (a-1)*a/2 + (b-a);
+		// std:://cerr << "res after - " << res << '\n';
+	}
 	return res;
 }
 
 int main(int argv, char* args[])
 {
 
-	string filename = argv[1];
-	std::ifstream in(filename+".graph");
-  std::streambuf *cinbuf = std::cin.rdbuf(); //save old buf
-  std::cin.rdbuf(in.rdbuf()); //redirect std::cin to in.txt!
-
-  std::ofstream out(filename+".satinput");
-  std::streambuf *coutbuf = std::cout.rdbuf(); //save old buf
-  std::cout.rdbuf(out.rdbuf()); //redirect std::cout to out.txt!
+	// string filename = argv[1];
+	// std::ifstream in(filename+".graph");
+  // std::streambuf *cinbuf = std::cin.rdbuf(); //save old buf
+  // std::cin.rdbuf(in.rdbuf()); //redirect std::cin to in.txt!
+	//
+  // std::ofstream out(filename+".satinput");
+  // std::streambuf *coutbuf = std::cout.rdbuf(); //save old buf
+  // std::cout.rdbuf(out.rdbuf()); //redirect std::cout to out.txt!
 
 
 	cin >> n >> m >> K;
 	nVar = n*K + K*(K-1)*n + m*K + n*(n-1)/2;
 	vector< vector<int> > constraints;
 	vector< vector<int> > edges(n+1);
-	vector< vector<int> > edges_prefix(n+1);
+	edges_prefix.resize(n+1);
 	int counter_const = 0;
 
 	for (int i = 1; i <= n; ++i)
 	{
-		edges[i].reshape(n+1);
+		edges[i].resize(n+1);
 		for (int j = 1; j <= n; ++j)
 		{
 			edges[i][j] = 0;
@@ -110,22 +117,34 @@ int main(int argv, char* args[])
 		if(a > b)
 		{
 			edges[b][a] = 1;
+			//cerr << "Edge between " << b << " " << a << "\n";
 		}
 		else
 		{
 			edges[a][b] = 1;
+			//cerr << "Edge between " << a << " " << b << "\n";
 		}
 	}
 
-	for (int i = 1; i <= n; ++i)
-	{
-		sort(edges[i].begin(), edges[i].end());
-	}
+	//cerr << "Printing edges matrix\n";
+	// for (int i = 1; i <= n; i++)
+	// {
+	// 	for (int j = 1; j <= n; j++)
+	// 	{
+	// 		cerr << edges[i][j] << " ";
+	// 	}
+	// 	cerr << "\n";
+	// }
+
+	// for (int i = 1; i <= n; ++i)
+	// {
+	// 	sort(edges[i].begin(), edges[i].end());
+	// }
 
 	int local_counter = 1;
 	for (int i = 1; i <= n; ++i)
 	{
-		edges_prefix[i].reshape(n+1);
+		edges_prefix[i].resize(n+1);
 		for (int j = 1; j <= n; ++j)
 		{
 			if(edges[i][j] == 1)
@@ -139,8 +158,6 @@ int main(int argv, char* args[])
 			}
 		}
 	}
-
-
 
 	// Each node in at least one k constraint
 	for (int i = 1; i <= n; ++i)
@@ -156,18 +173,20 @@ int main(int argv, char* args[])
 	// Clique constraint
 	for (int k = 1; k <= K; ++k)
 	{
-		for (int j = 1; j <= n; ++j)
+		for (int i = 1; i <= n; ++i)
 		{
-			for (int i = 1; i <= n; ++i)
+			for (int j = i+1; j <= n; ++j)
 			{
+				if(edges[i][j] == 1)
+					continue;
 				vector<int> local_constraint;
 				int a, b, c;
 				a = -1*get_index(i,k,0,0);
 				b = -1*get_index(j,k,0,0);
-				c = get_index(i,j,0,3);
+				// c = get_index(i,j,0,3);
 				local_constraint.push_back(a);
 				local_constraint.push_back(b);
-				local_constraint.push_back(c);
+				// local_constraint.push_back(c);
 				constraints.push_back(local_constraint);
 			}
 		}
@@ -186,7 +205,7 @@ int main(int argv, char* args[])
 			}
 			constraints.push_back(local_constraint);
 
-			vector<int> local_constraint;
+			local_constraint.resize(0);
 			for (int i = 0; i <= n; ++i)
 			{
 				local_constraint.push_back(get_index(i, k2, k1, 1));
@@ -232,12 +251,12 @@ int main(int argv, char* args[])
 				local_constraint.push_back(b);
 				constraints.push_back(local_constraint);
 
-				vector<int> local_constraint;
+				local_constraint.resize(0);
 				local_constraint.push_back(-1*a);
 				local_constraint.push_back(-1*c);
 				constraints.push_back(local_constraint);
 
-				vector<int> local_constraint;
+				local_constraint.resize(0);
 				local_constraint.push_back(a);
 				local_constraint.push_back(-1*b);
 				local_constraint.push_back(c);
@@ -266,12 +285,12 @@ int main(int argv, char* args[])
 				local_constraint.push_back(b);
 				constraints.push_back(local_constraint);
 
-				vector<int> local_constraint;
+				local_constraint.resize(0);
 				local_constraint.push_back(-1*a);
 				local_constraint.push_back(c);
 				constraints.push_back(local_constraint);
 
-				vector<int> local_constraint;
+				local_constraint.resize(0);
 				local_constraint.push_back(a);
 				local_constraint.push_back(-1*b);
 				local_constraint.push_back(-1*c);
@@ -282,26 +301,28 @@ int main(int argv, char* args[])
 	}
 
 	// y constraint
-	for (int i = 1; i <= n; ++i)
-	{
-		for (int j = i+1; j <= n; ++j)
-		{
-			vector<int> local_constraint(1);
-			if(edges[i][j] == 0)
-			{
-				local_constraint[0] = -1*get_index(i,j,0,3);
-			}
-			else
-			{
-				local_constraint[0] = get_index(i,j,0,3);
-			}
-			constraints.push_back(local_constraint);
-		}
-	}
+	// for (int i = 1; i <= n; ++i)
+	// {
+	// 	for (int j = i+1; j <= n; ++j)
+	// 	{
+	// 		vector<int> local_constraint(1);
+	// 		if(edges[i][j] == 0)
+	// 		{
+	// 			local_constraint[0] = -1*get_index(i,j,0,3);
+	// 			//cerr << "No edge between " << i << " and " << j << " " << get_index(i,j,0,3) << "\n";
+	// 		}
+	// 		else
+	// 		{
+	// 			local_constraint[0] = get_index(i,j,0,3);
+	// 			//cerr << "Adding edge between " << i << " and " << j <<  " " << get_index(i,j,0,3) << "\n";
+	// 		}
+	// 		constraints.push_back(local_constraint);
+	// 	}
+	// }
 	nClause = constraints.size();
 
 	// Print out constraints
-	cout << "p cnf" << to_string(nVar) << to_string(nClause) << "\n";
+	cout << "p cnf " << to_string(nVar) << " " << to_string(nClause) << " \n";
 	for(vector< vector<int> >::iterator it = constraints.begin(); it != constraints.end(); ++it)
 	{
 	    vector<int> constraint = *it;
@@ -309,9 +330,9 @@ int main(int argv, char* args[])
 			{
 				cout << to_string(*it_vec) << ' ';
 			}
-			std::cout << "0\n";
+			cout << "0\n";
 	}
 
-	cin.rdbuf(cinbuf);   //reset to standard input again
-  cout.rdbuf(coutbuf); //reset to standard output again
+	// cin.rdbuf(cinbuf);   //reset to standard input again
+  // cout.rdbuf(coutbuf); //reset to standard output again
 }
