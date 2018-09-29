@@ -33,7 +33,7 @@ sort(start itr, end itr)
 */
 using namespace std;
 
-int n, m, k;
+int n, m, K;
 
 int pseudohash(int a, int b)
 {
@@ -54,22 +54,22 @@ int get_index(int a, int b, int c, int mode)
 	int res;
 	switch (mode)
 	{
-		case 1: res = n*k;
-		case 2: res = n*k + k*(k-1)*n;
-		case 3: res = n*k + k*(k-1)*n + m*k;
+		case 1: res = n*K;
+		case 2: res = n*K + K*(K-1)*n;
+		case 3: res = n*K + K*(K-1)*n + m*K;
 		default : res = 0;
 	}
 	if (mode == 0)
-		res += (a-1)*k + b;
+		res += (b-1)*n + a;
 	if (mode == 1)
 	{
-		res += (a-1)*k*(k-1) + (b-1)*(k)+c;
+		res += (a-1)*K*(K-1) + (b-1)*(K)+c;
 		res -= b < c ? b : b-1;
 	}
 	if (mode == 2)
-		res += (edges_prefix[a][b]-1)*k + c;
+		res += (edges_prefix[a][b]-1)*K + c;
 	if (mode == 3)
-		res += (a-1)*a/2 + b;
+		res += (a-1)*n - (a-1)*a/2 + b;
 	return res;
 }
 
