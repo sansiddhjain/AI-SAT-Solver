@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <string.h>
 #include <math.h>
 #include <bits/stdc++.h>
@@ -33,7 +34,7 @@ sort(start itr, end itr)
 */
 using namespace std;
 
-int n, m, K;
+int n, m, K, nVar, nClause;
 
 int pseudohash(int a, int b)
 {
@@ -75,7 +76,19 @@ int get_index(int a, int b, int c, int mode)
 
 int main(int argv, char* args[])
 {
+
+	string filename = argv[1];
+	std::ifstream in(filename+".graph");
+  std::streambuf *cinbuf = std::cin.rdbuf(); //save old buf
+  std::cin.rdbuf(in.rdbuf()); //redirect std::cin to in.txt!
+
+  std::ofstream out(filename+".satinput");
+  std::streambuf *coutbuf = std::cout.rdbuf(); //save old buf
+  std::cout.rdbuf(out.rdbuf()); //redirect std::cout to out.txt!
+
+
 	cin >> n >> m >> K;
+	nVar = n*K + K*(K-1)*n + m*K + n*(n-1)/2;
 	vector< vector<int> > constraints;
 	vector< vector<int> > edges(n+1);
 	vector< vector<int> > edges_prefix(n+1);
@@ -285,4 +298,20 @@ int main(int argv, char* args[])
 			constraints.push_back(local_constraint);
 		}
 	}
+	nClause = constraints.size();
+
+	// Print out constraints
+	cout << "p cnf" << to_string(nVar) << to_string(nClause) << "\n";
+	for(vector< vector<int> >::iterator it = constraints.begin(); it != constraints.end(); ++it)
+	{
+	    vector<int> constraint = *it;
+			for(vector<int>::iterator it_vec = constraint.begin(); it_vec != constraint.end(); ++it_vec)
+			{
+				cout << to_string(*it_vec) << ' ';
+			}
+			std::cout << "0\n";
+	}
+
+	cin.rdbuf(cinbuf);   //reset to standard input again
+  cout.rdbuf(coutbuf); //reset to standard output again
 }
