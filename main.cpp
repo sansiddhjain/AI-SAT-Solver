@@ -77,11 +77,12 @@ int get_index(int a, int b, int c, int mode)
 int main(int argv, char* args[])
 {
 
-	std::ifstream in("test.graph");
+	string filename = argv[1];
+	std::ifstream in(filename+".graph");
   std::streambuf *cinbuf = std::cin.rdbuf(); //save old buf
   std::cin.rdbuf(in.rdbuf()); //redirect std::cin to in.txt!
 
-  std::ofstream out("test.minsatinput");
+  std::ofstream out(filename+".satinput");
   std::streambuf *coutbuf = std::cout.rdbuf(); //save old buf
   std::cout.rdbuf(out.rdbuf()); //redirect std::cout to out.txt!
 
