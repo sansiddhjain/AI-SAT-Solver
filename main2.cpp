@@ -41,7 +41,8 @@ int main(int argv, char* args[])
 	cin >> n >> m >> K;
 
 	ifstream myfile;
-	myfile.open ("test.satoutput", ios::in);
+	string fname = args[1];
+	myfile.open (fname+".satoutput", ios::in);
 
 	string sat;
 	myfile >> sat;

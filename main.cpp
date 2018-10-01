@@ -95,11 +95,13 @@ int main(int argv, char* args[])
 
 
 	cin >> n >> m >> K;
-	nVar = n*K + K*(K-1)*n + m*K + n*(n-1)/2;
+	nVar = n*K + K*(K-1)*n + m*K;
+	 // + n*(n-1)/2;
 	vector< vector<int> > constraints;
 	vector< vector<int> > edges(n+1);
 	edges_prefix.resize(n+1);
 	int counter_const = 0;
+	int node_const, clique_const, subgraph_const, edge_const, z_const, u_const;
 
 	for (int i = 1; i <= n; ++i)
 	{
@@ -125,21 +127,6 @@ int main(int argv, char* args[])
 			//cerr << "Edge between " << a << " " << b << "\n";
 		}
 	}
-
-	//cerr << "Printing edges matrix\n";
-	// for (int i = 1; i <= n; i++)
-	// {
-	// 	for (int j = 1; j <= n; j++)
-	// 	{
-	// 		cerr << edges[i][j] << " ";
-	// 	}
-	// 	cerr << "\n";
-	// }
-
-	// for (int i = 1; i <= n; ++i)
-	// {
-	// 	sort(edges[i].begin(), edges[i].end());
-	// }
 
 	int local_counter = 1;
 	for (int i = 1; i <= n; ++i)
@@ -169,6 +156,7 @@ int main(int argv, char* args[])
 		}
 		constraints.push_back(local_constraint);
 	}
+	node_const = constraints.size();
 
 	// Clique constraint
 	for (int k = 1; k <= K; ++k)
@@ -190,8 +178,8 @@ int main(int argv, char* args[])
 				constraints.push_back(local_constraint);
 			}
 		}
-
 	}
+	clique_const = constraints.size() -node_const;
 
 	// Subgraph constraint
 	for (int k1 = 1; k1 <= K; ++k1)
@@ -199,20 +187,22 @@ int main(int argv, char* args[])
 		for (int k2 = k1+1; k2 <= K; ++k2)
 		{
 			vector<int> local_constraint;
-			for (int i = 0; i <= n; ++i)
+			for (int i = 1; i <= n; ++i)
 			{
 				local_constraint.push_back(get_index(i, k1, k2, 1));
 			}
 			constraints.push_back(local_constraint);
 
 			local_constraint.resize(0);
-			for (int i = 0; i <= n; ++i)
+			for (int i = 1; i <= n; ++i)
 			{
 				local_constraint.push_back(get_index(i, k2, k1, 1));
 			}
 			constraints.push_back(local_constraint);
 		}
 	}
+	std::cerr << constraints.size() << '\n';
+	subgraph_const = constraints.size() - clique_const;
 
 	// Edge constraint
 	for (int i = 1; i <= n; ++i)
@@ -229,6 +219,7 @@ int main(int argv, char* args[])
 			constraints.push_back(local_constraint);
 		}
 	}
+	edge_const = constraints.size() - subgraph_const;
 
 
 	// z constraint
@@ -264,6 +255,7 @@ int main(int argv, char* args[])
 			}
 		}
 	}
+	z_const = constraints.size() - edge_const;
 
 	// u constraint
 	for (int i = 1; i <= n; ++i)
@@ -299,6 +291,7 @@ int main(int argv, char* args[])
 			}
 		}
 	}
+	u_const = constraints.size() - z_const;
 
 	// y constraint
 	// for (int i = 1; i <= n; ++i)
@@ -320,6 +313,13 @@ int main(int argv, char* args[])
 	// 	}
 	// }
 	nClause = constraints.size();
+
+	cerr << "node_const " << node_const << "\n";
+	cerr << "clique_const " << clique_const << "\n";
+	cerr << "subgraph_const " << subgraph_const << "\n";
+	cerr << "edge_const " << edge_const << "\n";
+	cerr << "z_const " << z_const << "\n";
+	cerr << "u_const " << u_const << "\n";
 
 	// Print out constraints
 	cout << "p cnf " << to_string(nVar) << " " << to_string(nClause) << " \n";
